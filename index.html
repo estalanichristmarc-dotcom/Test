@@ -5,8 +5,8 @@
     <title>A Message for Julia</title>
     <style>
         body {
-            background-color: #0d1117;
-            color: #58a6ff;
+            background-color: #ffffff; /* Pure White Background */
+            color: #ff6680; /* Rose Pink Text */
             font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
@@ -15,20 +15,21 @@
             margin: 0;
         }
         .letter-box {
-            background-color: #161b22;
-            border: 2px solid #30363d;
+            background-color: #ffffff; /* Pure White Card */
+            border: 2px solid #ff6680; /* Rose Pink Border */
             padding: 35px;
             border-radius: 10px;
             text-align: center;
-            width: 500px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            width: 550px;
+            box-shadow: 0 4px 20px rgba(255, 102, 128, 0.15); /* Soft Rose Shadow */
         }
         h2 {
             margin-bottom: 30px;
             font-size: 1.25rem;
             line-height: 1.6;
-            color: #c9d1d9;
+            color: #ff6680; /* Rose Pink Heading */
             white-space: pre-line;
+            min-height: 60px; /* Prevents layout jumping while typing */
         }
         .btn-group {
             display: flex;
@@ -37,9 +38,9 @@
             flex-wrap: wrap;
         }
         button {
-            background-color: #21262d;
-            color: #c9d1d9;
-            border: 1px solid #30363d;
+            background-color: #ffffff; /* Pure White Button */
+            color: #ff6680; /* Rose Pink Text */
+            border: 1px solid #ff6680; /* Rose Pink Border */
             padding: 12px 20px;
             font-size: 0.9rem;
             cursor: pointer;
@@ -48,12 +49,12 @@
             transition: 0.2s;
         }
         button:hover {
-            background-color: #30363d;
-            color: #58a6ff;
-            border-color: #58a6ff;
+            background-color: #ff6680; /* Fills with Rose Pink on hover */
+            color: #ffffff; /* Text turns White on hover */
+            border-color: #ff6680;
         }
         .dead {
-            color: #ff7b72;
+            color: #ff6680; /* Matching Rose Pink for the death text */
             font-weight: bold;
         }
     </style>
@@ -70,141 +71,402 @@
     </div>
 
     <script>
+        // Sandbox Compatible Typewriter Engine
+        function typeText(element, text, callback) {
+            element.innerHTML = "";
+            let i = 0;
+            
+            // Instantly render if text has HTML styling to avoid code parser bugs
+            if (text.indexOf("<span") !== -1) {
+                element.innerHTML = text;
+                if (callback) callback();
+                return;
+            }
+
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 20); // Typing speed
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+
         function choosePath(choice) {
             const textElement = document.getElementById("story-text");
             const btnContainer = document.getElementById("button-container");
 
+            let targetText = "";
+            let targetButtons = "";
+
             switch(choice) {
                 // ================= LAYER 1 =================
                 case 'hello':
-                    textElement.innerText = "hi, galing ko mag program neto noh?";
-                    btnContainer.innerHTML = `
+                    targetText = "hi, galing ko mag program neto noh?";
+                    targetButtons = `
                         <button onclick="choosePath('ampangit')">ampangit</button>
                         <button onclick="choosePath('galing_mo')">galing mo talaga</button>
                     `;
                     break;
 
                 case 'uh':
-                    textElement.innerText = "confusing diba? program lng to, parang story making lng pero may lines";
-                    btnContainer.innerHTML = `
+                    targetText = "confusing diba? program lng to, parang story making lng pero may lines";
+                    targetButtons = `
                         <button onclick="choosePath('ohh_ok')">ohh ok</button>
                         <button onclick="choosePath('wow')">wow ang galing</button>
                     `;
                     break;
 
                 case 'hi_chris':
-                    textElement.innerText = "Hilow hehe, wanna know why i made this?";
-                    btnContainer.innerHTML = `
+                    targetText = "Hilow hehe, wanna know why i made this?";
+                    targetButtons = `
                         <button onclick="choosePath('why')">why?</button>
                         <button onclick="choosePath('yoko')">yoko</button>
                     `;
                     break;
 
                 // ================= LAYER 2 =================
-                // From 'hello' path
                 case 'ampangit':
-                    textElement.innerText = "bruh, ang tagal ko talagang ginawa to, nag start ako ng 8:30 am ng June 30, 2026, oh diba last day, appreciate mo naman ako";
-                    btnContainer.innerHTML = `
+                    targetText = "bruh, ang tagal ko talagang ginawa to, nag start ako ng 8:30 am ng June 30, 2026, oh diba last day, appreciate mo naman ako";
+                    targetButtons = `
                         <button onclick="choosePath('oh_sorry')">oh sorryy</button>
                         <button onclick="choosePath('pangit_promise')">pangit neto promise</button>
                     `;
                     break;
 
                 case 'galing_mo':
-                    textElement.innerText = "syempre ako pa, btw i made this as a memory lng kasi i know di rin naman ako tatagal sayo, pero... depende sa panahon diba?";
-                    btnContainer.innerHTML = `
+                    targetText = "syempre ako pa, btw i made this as a memory lng kasi i know di rin naman ako tatagal sayo, pero... depende sa panahon diba?";
+                    targetButtons = `
                         <button onclick="choosePath('left_you')">di ka tumagal sakin, kasi i left you</button>
                         <button onclick="choosePath('just_friends')">yea, we just became friends, ayun lang..</button>
                     `;
                     break;
 
-                // From 'uh' path
                 case 'ohh_ok':
-                    textElement.innerText = "yeah, btw im Chris.bot, kasi di malalaman ni Chris kung ano ano pinipindot mo dito, ikaw lang makakaalam hehe";
-                    btnContainer.innerHTML = `
+                    targetText = "yeah, btw im Chris.bot, kasi di malalaman ni Chris kung ano ano pinipindot mo dito, ikaw lang makakaalam hehe";
+                    targetButtons = `
                         <button onclick="choosePath('luh_wehhh')">luh wehhh</button>
                         <button onclick="choosePath('oh_ok_why')">oh ok why?</button>
                     `;
                     break;
 
                 case 'wow':
-                    textElement.innerText = "sus ako pa, btw si Chris.bot lang ako ahh.., programmed by Chris, wanna know something about Chris?";
-                    btnContainer.innerHTML = `
+                    targetText = "sus ako pa, btw si Chris.bot lang ako ahh.., programmed by Chris, wanna know something about Chris?";
+                    targetButtons = `
                         <button onclick="choosePath('sure')">sure</button>
                         <button onclick="choosePath('nah')">nah</button>
                     `;
                     break;
 
-                // From 'Hi Chris' path
                 case 'why':
-                    textElement.innerText = "for a way so you could remember me, also dont worry if theres any hacks or virus in this site basta ito mostly ginagamit namin pag nag poprogram";
-                    btnContainer.innerHTML = `
+                    targetText = "for a way so you could remember me, also dont worry if theres any hacks or virus in this site basta ito mostly ginagamit namin pag nag poprogram";
+                    targetButtons = `
                         <button onclick="choosePath('ok_sabi_mo')">okay, sabi mo eh</button>
                         <button onclick="choosePath('ayaw_maalala')">pano pag ayaw kitang maalala?</button>
                     `;
                     break;
 
                 case 'yoko':
-                    textElement.innerText = "ay edi wag, btw lets play a game";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "ay edi wag, btw lets play a game";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
-                // ================= LAYER 3 (ENDINGS / FINAL LINES) =================
-                // Sub-branches of ampangit
+                // ================= NEW DEEP CUSTOM BRANCHES =================
                 case 'oh_sorry':
-                    textElement.innerText = "geh lang";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "geh lang";
+                    targetButtons = `
+                        <button onclick="choosePath('hayyy')">hayyy</button>
+                        <button onclick="choosePath('okay_ka_lang')">okay ka lang?</button>
+                    `;
                     break;
 
                 case 'pangit_promise':
-                    textElement.innerHTML = "*hinagisan ng palaka sa mukha*\n\n<span class='dead'>( You Died )</span>";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "*hinagisan ng palaka sa mukha*\n\n<span class='dead'>( You Died )</span>";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
-                // Sub-branches of galing mo talaga
+                case 'hayyy':
+                    targetText = "you good?";
+                    targetButtons = `
+                        <button onclick="choosePath('yeah')">yeah</button>
+                        <button onclick="choosePath('no')">no</button>
+                    `;
+                    break;
+
+                case 'okay_ka_lang':
+                    targetText = "yeah, but the problem is you still like him, right? you kind of stalked him because you know some details about him";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'no':
+                    targetText = "why?";
+                    targetButtons = `
+                        <button onclick="choosePath('may_sakit_ako')">may sakit ako</button>
+                        <button onclick="choosePath('fine_hehe')">im fine actually hehe</button>
+                    `;
+                    break;
+
+                case 'may_sakit_ako':
+                    targetText = "pagaling ka ahh, inum ka madaming tubig at gamot.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'fine_hehe':
+                    targetText = "mabuti naman kung ganun, wag mo papabayaan sarili mo ah.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'yeah':
+                    targetText = "thats good";
+                    targetButtons = `
+                        <button onclick="choosePath('ikaw')">ikaw?</button>
+                        <button onclick="choosePath('hihi')">hihi</button>
+                    `;
+                    break;
+
+                case 'hihi':
+                    targetText = "hehe, btw ang sakit sa ulo gumawa ng program nato ngl.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'ikaw':
+                    targetText = "im fine, but i want to advice you something";
+                    targetButtons = <button onclick="choosePath('what_is_it')">what is it</button>;
+                    break;
+
+                case 'what_is_it':
+                    targetText = "be positive and dont lie to your friends, mostly when its the most important topic, its okay to lie but not always";
+                    targetButtons = `
+                        <button onclick="choosePath('wont_listen')">i wont listen to that advice</button>
+                        <button onclick="choosePath('i_understand')">i understand, i promise i will do that</button>
+                    `;
+                    break;
+
+                case 'wont_listen':
+                    targetText = "why?";
+                    targetButtons = `
+                        <button onclick="choosePath('dont_care')">i dont care about you anymore</button>
+                        <button onclick="choosePath('dont_tell_me')">dont tell me what to do</button>
+                    `;
+                    break;
+
+                case 'dont_care':
+                    targetText = "well, he cant see that you answered this, too bad.";
+                    targetButtons = `
+                        <button onclick="choosePath('bruh_caps')">BRUH</button>
+                        <button onclick="choosePath('hate_you')">i hate you soo much</button>
+                    `;
+                    break;
+
+                case 'bruh_caps':
+                    targetText = "hahaha";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'hate_you':
+                    targetText = "saying it twice is weird to a bot";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'dont_tell_me':
+                    targetText = "hayy, i know well you will answer this, you dont learn from mistakes...";
+                    targetButtons = `
+                        <button onclick="choosePath('do_learn')">i do learn from them</button>
+                        <button onclick="choosePath('do_it_again')">i will do it again because i dont give a f</button>
+                    `;
+                    break;
+
+                case 'do_learn':
+                    targetText = "you never do, i always asked you about the guy and u just said paghanga, but still you made it as a secret, also your friends, you also lied to them, i feel bad for them";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'do_it_again':
+                    targetText = "*inatake ng palaka at kinain sya*\n\n<span class='dead'>( You Died )</span>";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'i_understand':
+                    targetText = "pinky promise?";
+                    targetButtons = `
+                        <button onclick="choosePath('pinky_promise_yes')">pinky promise</button>
+                        <button onclick="choosePath('pinky_no')">no</button>
+                    `;
+                    break;
+
+                case 'pinky_promise_yes':
+                    targetText = "yehey";
+                    targetButtons = <button onclick="choosePath('hihihi_end')">hihihi</button>;
+                    break;
+
+                case 'hihihi_end':
+                    targetText = "smiling bot noises memory saved.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'pinky_no':
+                    targetText = "why?";
+                    targetButtons = `
+                        <button onclick="choosePath('reason_not_worth')">because theres a reason that is not worth telling you</button>
+                        <button onclick="choosePath('nevermind_promise')">nevermind, i actually promise..</button>
+                    `;
+                    break;
+
+                case 'nevermind_promise':
+                    targetText = "pinky promise?";
+                    targetButtons = `
+                        <button onclick="choosePath('pinky_promise_yes')">pinky promise</button>
+                        <button onclick="choosePath('pinky_no')">no</button>
+                    `;
+                    break;
+
+                case 'reason_not_worth':
+                    targetText = "what is it?";
+                    targetButtons = `
+                        <button onclick="choosePath('selfish_reason')">i always lied to my friends because im a selfish person, even to my relatives, even you, i hate myself because i am doing selfish decisions by myself...</button>
+                        <button onclick="choosePath('cant_tell_you')">i cant tell you..</button>
+                    `;
+                    break;
+
+                case 'cant_tell_you':
+                    targetText = "if you're gonna answer it like that, it wouldnt make any sense if you tell me nothing";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'selfish_reason':
+                    targetText = "finally an honest answer 🙂";
+                    targetButtons = `
+                        <button onclick="choosePath('ayan_na')">ayan na, yan yung gusto mong malaman eh</button>
+                        <button onclick="choosePath('sorry_took_long')">yeah, im sorry if it took me long to be honest with you</button>
+                    `;
+                    break;
+
+                case 'ayan_na':
+                    targetText = "Mmm, you can pour it out if you want but, just know i would rather listen to them all than just you lying to me or not saying it all.";
+                    targetButtons = `
+                        <button onclick="choosePath('why_listen')">why do you want to listen to me</button>
+                    `;
+                    break;
+
+                case 'why_listen':
+                    targetText = "because i dont want you to hide it";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'sorry_took_long':
+                    targetText = "its fine, you can tell me everything, rather than just keeping it all to yourself";
+                    targetButtons = `
+                        <button onclick="choosePath('like_wennie')">okayy, i like wennie</button>
+                        <button onclick="choosePath('losing_interest')">im losing interest of you</button>
+                        <button onclick="choosePath('want_free')">i want you to be free</button>
+                    `;
+                    break;
+
+                case 'want_free':
+                    targetText = "thank you, being free means letting both of us figure out paths that are real.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'like_wennie':
+                    targetText = "okay go ahead";
+                    targetButtons = `
+                        <button onclick="choosePath('losing_interest_wennie')">and i am losing interest of you, i know you treated me better but i really want someone who exists here where someone i can look up to</button>
+                    `;
+                    break;
+
+                case 'losing_interest_wennie':
+                    targetText = "thats good, well i know you're still young and deserve someone who really exists there rather than me, who is far away from you.. so yeah i understand";
+                    targetButtons = `
+                        <button onclick="choosePath('im_sorry_end')">im sorry</button>
+                        <button onclick="choosePath('not_it_end')">no thats not it</button>
+                    `;
+                    break;
+
+                case 'im_sorry_end':
+                    targetText = "let me go now if you're only here to show that you are kind, i dont want you to fake it anymore";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'not_it_end':
+                    targetText = "what is it then?";
+                    targetButtons = `
+                        <button onclick="choosePath('stay_until_find')">i want you to be with me and stay with me until i find that person</button>
+                    `;
+                    break;
+
+                case 'stay_until_find':
+                    targetText = "that wouldn't be fair to either of us. it's better to end it properly here.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'losing_interest':
+                    targetText = "i know that well, because of your reposts, it came up to my fyp saying \"when you found the right one but...\" something like that, so yeah i know you already lost interest of me long time ago";
+                    targetButtons = `
+                        <button onclick="choosePath('sorry_simple')">sorry</button>
+                        <button onclick="choosePath('hayyss_simple')">hayyss</button>
+                    `;
+                    break;
+
+                case 'sorry_simple':
+                    targetText = "no need to say sorry, things change and fields grow apart. take care.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                case 'hayyss_simple':
+                    targetText = "sighing won't change where paths lead. thank you for playing through this script.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    break;
+
+                // ================= BASELINE ENDINGS FROM PREVIOUS CODE =================
                 case 'left_you':
-                    textElement.innerText = "yea i know that, you left me because of wennie, hayy ewan ko nlng sayo kung bakit ka ganyan sakin right after nagkaroon na ng pasukan, i literally loved you but i guess.. i wasnt enough for you.";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "yea i know that, you left me because of wennie, hayy ewan ko nlng sayo kung bakit ka ganyan sakin right after nagkaroon na ng pasukan, i literally loved you but i guess.. i wasnt enough for you.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
                 case 'just_friends':
-                    textElement.innerText = "wanna know why im treating you as a friend only?";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "wanna know why im treating you as a friend only?";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
-                // Sub-branches of ohh ok
                 case 'luh_wehhh':
-                    textElement.innerText = "if you dont believe me, this is literally a program site that i dont actually own and you just stole my code, also u can use this code on an offline application since this is just an html and meron din syang css, actually pwede mongang gamitin tong code ko eh.";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "if you dont believe me, this is literally a program site that i dont actually own and you just stole my code, also u can use this code on an offline application since this is just an html and meron din syang css, actually pwede mongang gamitin tong code ko eh.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
                 case 'oh_ok_why':
-                    textElement.innerText = "because this is just a code that you just copied bruh";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "because this is just a code that you just copied bruh";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
-                // Sub-branches of wow ang galing
                 case 'sure':
-                    textElement.innerText = "alright, ever since he was a kid he is a valedictorian at 5 years old, and when he came up to elementary, he is just a dumb kid, then when he came up to junior highschool, he is just getting achievements and honors but he is more dedicated into learning about computer stuffs, but yeah he is still a dumb person that needs alot of things to learn in life.";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "alright, Chris never lied to you, even if you say he did, never in his mind has come up with a lie.";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
                 case 'nah':
-                    textElement.innerText = "alright, are you happy with your decisions you made?";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "alright, are you happy with your decisions you made?";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
-                // Sub-branches of why?
                 case 'ok_sabi_mo':
-                    textElement.innerText = "good girl";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "good girl";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
 
                 case 'ayaw_maalala':
-                    textElement.innerText = "edi wag nalang daw hahahahha";
-                    btnContainer.innerHTML = `<button onclick="location.reload()">Restart</button>`;
+                    targetText = "edi wag nalang daw hahahahha";
+                    targetButtons = <button onclick="location.reload()">Restart</button>;
                     break;
             }
+
+            // Clear buttons instantly while text types out
+            btnContainer.innerHTML = "";
+            typeText(textElement, targetText, function() {
+                btnContainer.innerHTML = targetButtons;
+            });
         }
     </script>
 
