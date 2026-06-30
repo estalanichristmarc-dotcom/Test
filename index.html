@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Message for Julia</title>
+    <style>
+        body {
+            background-color: #ffe5ec; /* Soft Light Pink */
+            color: #ff4d6d; /* Deep Rose */
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .terminal {
+            background-color: #ffb3c1; /* Medium Rose Pink */
+            border: 3px solid #ff4d6d; /* Deep Rose Border */
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 8px 16px rgba(255, 77, 109, 0.2);
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            color: #ff4d6d; /* Deep Rose */
+            white-space: pre-line;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #ffe5ec; /* Soft Light Pink */
+            color: #ff4d6d; /* Deep Rose */
+            border: 2px solid #ff4d6d; /* Deep Rose */
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: #ff4d6d; /* Deep Rose */
+            color: #ffe5ec; /* Soft Light Pink */
+        }
+
+        .dead {
+            font-weight: bold;
+            color: #b7094c;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal">
+        <h2 id="story-text">Hi Julia</h2>
+        
+        <div id="layer1" class="btn-group">
+            <button onclick="choosePath('hello')">hello?</button>
+            <button onclick="choosePath('uh')">uh..</button>
+            <button onclick="choosePath('hi_chris')">Hi Chris</button>
+        </div>
+
+        <div id="path-hello" class="btn-group" style="display: none;">
+            <button onclick="choosePath('ampangit')">ampangit</button>
+            <button onclick="choosePath('galing_mo')">galing mo talaga</button>
+        </div>
+
+        <div id="path-uh" class="btn-group" style="display: none;">
+            <button onclick="choosePath('ohh_ok')">ohh ok</button>
+            <button onclick="choosePath('wow')">wow ang galing</button>
+        </div>
+
+        <div id="path-hi-chris" class="btn-group" style="display: none;">
+            <button onclick="choosePath('why')">why?</button>
+            <button onclick="choosePath('yoko')">yoko</button>
+        </div>
+
+        <div id="path-ampangit" class="btn-group" style="display: none;">
+            <button onclick="choosePath('oh_sorry')">oh sorryy</button>
+            <button onclick="choosePath('pangit_promise')">pangit neto promise</button>
+        </div>
+
+        <div id="path-galing-mo" class="btn-group" style="display: none;">
+            <button onclick="choosePath('left_you')">di ka tumagal sakin, kasi i left you</button>
+            <button onclick="choosePath('just_friends')">yea, we just became friends, ayun lang..</button>
+        </div>
+
+        <div id="path-ohh-ok" class="btn-group" style="display: none;">
+            <button onclick="choosePath('luh_wehhh')">luh wehhh</button>
+            <button onclick="choosePath('oh_ok_why')">oh ok why?</button>
+        </div>
+
+        <div id="path-wow" class="btn-group" style="display: none;">
+            <button onclick="choosePath('sure')">sure</button>
+            <button onclick="choosePath('nah')">nah</button>
+        </div>
+
+        <div id="path-why" class="btn-group" style="display: none;">
+            <button onclick="choosePath('ok_sabi_mo')">okay, sabi mo eh</button>
+            <button onclick="choosePath('ayaw_maalala')">pano pag ayaw kitang maalala?</button>
+        </div>
+
+        <div id="path-restart" class="btn-group" style="display: none;">
+            <button onclick="resetGame()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+    function choosePath(choice) {
+        const textElement = document.getElementById("story-text");
+        
+        // Hide all button groups first
+        const groups = document.querySelectorAll('.btn-group');
+        groups.forEach(group => group.style.display = 'none');
+
+        // Handle paths and toggle visibility of the correct containers
+        switch(choice) {
+            // LAYER 1
+            case 'hello':
+                textElement.innerText = "hi, galing ko mag program neto noh?";
+                document.getElementById('path-hello').style.display = 'flex';
+                break;
+            case 'uh':
+                textElement.innerText = "confusing diba? program lng to, parang story making lng pero may lines";
+                document.getElementById('path-uh').style.display = 'flex';
+                break;
+            case 'hi_chris':
+                textElement.innerText = "Hilow hehe, wanna know why i made this?";
+                document.getElementById('path-hi-chris').style.display = 'flex';
+                break;
+
+            // LAYER 2
+            case 'ampangit':
+                textElement.innerText = "bruh, ang tagal ko talagang ginawa to, nag start ako ng 8:30 am ng June 30, 2026, oh diba last day, appreciate mo naman ako";
+                document.getElementById('path-ampangit').style.display = 'flex';
+                break;
+            case 'galing_mo':
+                textElement.innerText = "syempre ako pa, btw i made this as a memory lng kasi i know di rin naman ako tatagal sayo, pero... depende sa panahon diba?";
+                document.getElementById('path-galing-mo').style.display = 'flex';
+                break;
+            case 'ohh_ok':
+                textElement.innerText = "yeah, btw im Chris.bot, kasi di malalaman ni Chris kung ano ano pinipindot mo dito, ikaw lang makakaalam hehe";
+                document.getElementById('path-ohh-ok').style.display = 'flex';
+                break;
+            case 'wow':
+                textElement.innerText = "sus ako pa, btw si Chris.bot lang ako ahh.., programmed by Chris, wanna know something about Chris?";
+                document.getElementById('path-wow').style.display = 'flex';
+                break;
+            case 'why':
+                textElement.innerText = "for a way so you could remember me, also dont worry if theres any hacks or virus in this site basta ito mostly ginagamit namin pag nag poprogram";
+                document.getElementById('path-why').style.display = 'flex';
+                break;
+            case 'yoko':
+                textElement.innerText = "ay edi wag, btw lets play a game";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+
+            // LAYER 3 ENDINGS
+            case 'oh_sorry':
+                textElement.innerText = "geh lang";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'pangit_promise':
+                textElement.innerHTML = "*hinagisan ng palaka sa mukha*\n<span class='dead'>( You Died )</span>";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'left_you':
+                textElement.innerText = "yea i know that, you left me because of wennie, hayy ewan ko nlng sayo kung bakit ka ganyan sakin right after nagkaroon na ng pasukan, i literally loved you but i guess.. i wasnt enough for you.";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'just_friends':
+                textElement.innerText = "wanna know why im treating you as a friend only?";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'luh_wehhh':
+                textElement.innerText = "if you dont believe me, this is literally a program site that i dont actually own and you just stole my code, also u can use this code on an offline application since this is just an html and meron din syang css, actually pwede mongang gamitin tong code ko eh.";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'oh_ok_why':
+                textElement.innerText = "because this is just a code that you just copied bruh";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'sure':
+                textElement.innerText = "alright, ever since he was a kid he is a valedictorian at 5 years old, and when he came up to elementary, he is just a dumb kid, then when he came up to junior highschool, he is just getting achievements and honors but he is more dedicated into learning about computer stuffs, but yeah he is still a dumb person that needs alot of things to learn in life.";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'nah':
+                textElement.innerText = "alright, are you happy with your decisions you made?";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'ok_sabi_mo':
+                textElement.innerText = "good girl";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+            case 'ayaw_maalala':
+                textElement.innerText = "edi wag nalang daw hahahahha";
+                document.getElementById('path-restart').style.display = 'flex';
+                break;
+        }
+    }
+
+    function resetGame() {
+        const textElement = document.getElementById("story-text");
+        const groups = document.querySelectorAll('.btn-group');
+        groups.forEach(group => group.style.display = 'none');
+        textElement.innerText = "Hi Julia";
+        document.getElementById('layer1').style.display = 'flex';
+    }
+    </script>
+</body>
+</html>
