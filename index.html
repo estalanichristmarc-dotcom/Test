@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Message for Julia</title>
     <style>
         body {
@@ -21,21 +22,27 @@
             border-radius: 10px;
             text-align: center;
             width: 550px;
+            max-width: 90%;
             box-shadow: 0 4px 20px rgba(255, 102, 128, 0.15); /* Soft Rose Shadow */
+            box-sizing: border-box;
         }
         h2 {
             margin-bottom: 30px;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             line-height: 1.6;
             color: #ff6680; /* Rose Pink Heading */
             white-space: pre-line;
-            min-height: 60px; /* Prevents layout jumping while typing */
+            min-height: 120px; /* Prevents card jumping up and down during lines */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-group {
             display: flex;
             justify-content: center;
             gap: 12px;
             flex-wrap: wrap;
+            min-height: 45px;
         }
         button {
             background-color: #ffffff; /* Pure White Button */
@@ -46,7 +53,7 @@
             cursor: pointer;
             border-radius: 6px;
             font-family: inherit;
-            transition: 0.2s;
+            transition: all 0.2s ease;
         }
         button:hover {
             background-color: #ff6680; /* Fills with Rose Pink on hover */
@@ -56,6 +63,8 @@
         .dead {
             color: #ff6680; /* Matching Rose Pink for the death text */
             font-weight: bold;
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -71,13 +80,13 @@
     </div>
 
     <script>
-        // Sandbox Compatible Typewriter Engine
+        // GitHub Pages Compatible Typewriter Engine
         function typeText(element, text, callback) {
             element.innerHTML = "";
             let i = 0;
             
-            // Instantly render if text has HTML styling to avoid code parser bugs
-            if (text.indexOf("<span") !== -1) {
+            // Instantly render if string has HTML tags anywhere inside to avoid script bugs
+            if (text.includes("<span") || text.includes("<button")) {
                 element.innerHTML = text;
                 if (callback) callback();
                 return;
@@ -87,7 +96,7 @@
                 if (i < text.length) {
                     element.innerHTML += text.charAt(i);
                     i++;
-                    setTimeout(type, 20); // Typing speed
+                    setTimeout(type, 15); /* Paced slightly smoother */
                 } else if (callback) {
                     callback();
                 }
@@ -171,10 +180,10 @@
 
                 case 'yoko':
                     targetText = "ay edi wag, btw lets play a game";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
-                // ================= NEW DEEP CUSTOM BRANCHES =================
+                // ================= LAYER 3 (DEEP CUSTOM BRANCHES) =================
                 case 'oh_sorry':
                     targetText = "geh lang";
                     targetButtons = `
@@ -185,7 +194,7 @@
 
                 case 'pangit_promise':
                     targetText = "*hinagisan ng palaka sa mukha*\n\n<span class='dead'>( You Died )</span>";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'hayyy':
@@ -198,7 +207,7 @@
 
                 case 'okay_ka_lang':
                     targetText = "yeah, but the problem is you still like him, right? you kind of stalked him because you know some details about him";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'no':
@@ -211,12 +220,12 @@
 
                 case 'may_sakit_ako':
                     targetText = "pagaling ka ahh, inum ka madaming tubig at gamot.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'fine_hehe':
                     targetText = "mabuti naman kung ganun, wag mo papabayaan sarili mo ah.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'yeah':
@@ -229,12 +238,12 @@
 
                 case 'hihi':
                     targetText = "hehe, btw ang sakit sa ulo gumawa ng program nato ngl.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'ikaw':
                     targetText = "im fine, but i want to advice you something";
-                    targetButtons = <button onclick="choosePath('what_is_it')">what is it</button>;
+                    targetButtons = `<button onclick="choosePath('what_is_it')">what is it</button>`;
                     break;
 
                 case 'what_is_it':
@@ -263,12 +272,12 @@
 
                 case 'bruh_caps':
                     targetText = "hahaha";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'hate_you':
                     targetText = "saying it twice is weird to a bot";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'dont_tell_me':
@@ -281,12 +290,12 @@
 
                 case 'do_learn':
                     targetText = "you never do, i always asked you about the guy and u just said paghanga, but still you made it as a secret, also your friends, you also lied to them, i feel bad for them";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'do_it_again':
                     targetText = "*inatake ng palaka at kinain sya*\n\n<span class='dead'>( You Died )</span>";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'i_understand':
@@ -299,12 +308,12 @@
 
                 case 'pinky_promise_yes':
                     targetText = "yehey";
-                    targetButtons = <button onclick="choosePath('hihihi_end')">hihihi</button>;
+                    targetButtons = `<button onclick="choosePath('hihihi_end')">hihihi</button>`;
                     break;
 
                 case 'hihihi_end':
-                    targetText = "smiling bot noises memory saved.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetText = "*smiling bot noises* memory saved.";
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'pinky_no':
@@ -333,11 +342,11 @@
 
                 case 'cant_tell_you':
                     targetText = "if you're gonna answer it like that, it wouldnt make any sense if you tell me nothing";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'selfish_reason':
-                    targetText = "finally an honest answer 🙂";
+                    targetText = "finally an honest answer :)";
                     targetButtons = `
                         <button onclick="choosePath('ayan_na')">ayan na, yan yung gusto mong malaman eh</button>
                         <button onclick="choosePath('sorry_took_long')">yeah, im sorry if it took me long to be honest with you</button>
@@ -353,7 +362,7 @@
 
                 case 'why_listen':
                     targetText = "because i dont want you to hide it";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'sorry_took_long':
@@ -367,7 +376,7 @@
 
                 case 'want_free':
                     targetText = "thank you, being free means letting both of us figure out paths that are real.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'like_wennie':
@@ -387,7 +396,7 @@
 
                 case 'im_sorry_end':
                     targetText = "let me go now if you're only here to show that you are kind, i dont want you to fake it anymore";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'not_it_end':
@@ -399,7 +408,7 @@
 
                 case 'stay_until_find':
                     targetText = "that wouldn't be fair to either of us. it's better to end it properly here.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'losing_interest':
@@ -412,53 +421,53 @@
 
                 case 'sorry_simple':
                     targetText = "no need to say sorry, things change and fields grow apart. take care.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'hayyss_simple':
                     targetText = "sighing won't change where paths lead. thank you for playing through this script.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
-                // ================= BASELINE ENDINGS FROM PREVIOUS CODE =================
+                // ================= BASELINE ENDINGS =================
                 case 'left_you':
                     targetText = "yea i know that, you left me because of wennie, hayy ewan ko nlng sayo kung bakit ka ganyan sakin right after nagkaroon na ng pasukan, i literally loved you but i guess.. i wasnt enough for you.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'just_friends':
-                    targetText = "wanna know why im treating you as a friend only?";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetText = "wanna know why im treating you as a friend only? because sometimes keeping someone close as a friend is the only way not to lose them completely when things change.";
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'luh_wehhh':
                     targetText = "if you dont believe me, this is literally a program site that i dont actually own and you just stole my code, also u can use this code on an offline application since this is just an html and meron din syang css, actually pwede mongang gamitin tong code ko eh.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'oh_ok_why':
                     targetText = "because this is just a code that you just copied bruh";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'sure':
                     targetText = "alright, Chris never lied to you, even if you say he did, never in his mind has come up with a lie.";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'nah':
                     targetText = "alright, are you happy with your decisions you made?";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'ok_sabi_mo':
                     targetText = "good girl";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
 
                 case 'ayaw_maalala':
                     targetText = "edi wag nalang daw hahahahha";
-                    targetButtons = <button onclick="location.reload()">Restart</button>;
+                    targetButtons = `<button onclick="location.reload()">Restart</button>`;
                     break;
             }
 
