@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chris.Bot</title>
+    <style>
+        body {
+            background-color: #ffffff; /* Pure White Background */
+            color: #ff6680; /* Rose Pink Text */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .letter-box {
+            background-color: #ffffff; /* Pure White Card */
+            border: 2px solid #ff6680; /* Rose Pink Border */
+            padding: 45px 35px 35px 35px;
+            border-radius: 10px;
+            text-align: center;
+            width: 550px;
+            max-width: 90%;
+            box-shadow: 0 4px 20px rgba(255, 102, 128, 0.15); /* Soft Rose Shadow */
+            box-sizing: border-box;
+            position: relative;
+        }
+        /* Top Center Text */
+        .bot-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+        }
+        h2 {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ff6680; /* Rose Pink Heading */
+            white-space: pre-line;
+            min-height: 120px; /* Prevents card jumping up and down during lines */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Main Menu Layout */
+        .menu-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Aligns buttons on the left side */
+            gap: 15px;
+            padding-left: 20px;
+            min-height: 150px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            min-height: 45px;
+        }
+        button {
+            background-color: #ffffff; /* Pure White Button */
+            color: #ff6680; /* Rose Pink Text */
+            border: 1px solid #ff6680; /* Rose Pink Border */
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background-color: #ff6680; /* Fills with Rose Pink on hover */
+            color: #ffffff; /* Text turns White on hover */
+            border-color: #ff6680;
+        }
+        /* Top-Left Corner Back Button Styles */
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid #ff6680;
+            background-color: transparent;
+            opacity: 0.6;
+            display: none;
+        }
+        .btn-back:hover {
+            opacity: 1;
+            background-color: #ff6680;
+            color: #ffffff;
+        }
+        .dead {
+            color: #ff6680; 
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio element for typing sound effect -->
+    <audio id="type-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+
+    <div class="letter-box">
+        <!-- Small back button positioned absolute in the top left corner -->
+        <button id="back-button" class="btn-back" onclick="goBack()">←</button>
+
+        <!-- Middle Center Top Title -->
+        <div class="bot-title">Chris.Bot</div>
+
+        <!-- Main Display Text Element -->
+        <h2 id="story-text">Select an option from the menu:</h2>
+         
+        <!-- Interactive Container (Starts with Main Menu layout) -->
+        <div id="button-container" class="menu-group">
+            <button onclick="choosePath('talking_page')">Talk to Chris.Bot</button>
+            <button onclick="choosePath('game_page')">Game</button>
+            <button onclick="choosePath('about_page')">About</button>
+        </div>
+    </div>
+
+    <script>
+        let pathHistory = [];
+        let currentPath = 'start';
+        let typeInterval; 
+
+        const typeSound = document.getElementById("type-sound");
+        typeSound.volume = 0.4; 
+
+        // Typewriter Engine
+        function typeText(element, text, callback) {
+            element.innerHTML = "";
+            let i = 0;
+            
+            if (typeInterval) clearInterval(typeInterval);
+
+            if (text.includes("<span") || text.includes("<button")) {
+                element.innerHTML = text;
+                if (callback) callback();
+                return;
+            }
+
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    
+                    if (text.charAt(i) !== " ") {
+                        typeSound.currentTime = 0; 
+                        typeSound.play().catch(e => console.log("Audio play blocked."));
+                    }
+                    
+                    i++;
+                    setTimeout(type, 25); 
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+
+        function goBack() {
+            if (pathHistory.length > 0) {
+                let previousPath = pathHistory.pop();
+                choosePath(previousPath, true);
+            }
+        }
+
+        // Mini-game processors
+        function playRPS(playerChoice) {
+            const choices = ['Rock', 'Paper', 'Scissors'];
+            const botChoice = choices[Math.floor(Math.random() * 3)];
+            let outcome = "";
+
+            if (playerChoice === botChoice) {
+                outcome = `We both chose ${botChoice}. It's a tie.`;
+            } else if (
+                (playerChoice === 'Rock' && botChoice === 'Scissors') ||
+                (playerChoice === 'Paper' && botChoice === 'Rock') ||
+                (playerChoice === 'Scissors' && botChoice === 'Paper')
+            ) {
+                outcome = `You chose ${playerChoice}, I chose ${botChoice}.\n\nYou won. Lucky you.`;
+            } else {
+                outcome = `You chose ${playerChoice}, I chose ${botChoice}.\n\nI win. Try harder next time.`;
+            }
+
+            const textElement = document.getElementById("story-text");
+            const btnContainer = document.getElementById("button-container");
+            btnContainer.innerHTML = "";
+            
+            typeText(textElement, outcome, function() {
+                btnContainer.innerHTML = `
+                    <button onclick="choosePath('game_rps')">Play Again</button>
+                    <button onclick="choosePath('game_page')">Back to Games</button>
+                `;
+            });
+        }
+
+        function playDice(playerGuess) {
+            const roll = Math.floor(Math.random() * 6) + 1;
+            let resultText = `The dice rolled a [ ${roll} ].\n`;
+
+            if (playerGuess === roll) {
+                resultText += "Wow, you actually guessed it right.";
+            } else {
+                resultText += "Wrong guess. Told you it's pure luck.";
+            }
+
+            const textElement = document.getElementById("story-text");
+            const btnContainer = document.getElementById("button-container");
+            btnContainer.innerHTML = "";
+
+            typeText(textElement, resultText, function() {
+                btnContainer.innerHTML = `
+                    <button onclick="choosePath('game_dice')">Guess Again</button>
+                    <button onclick="choosePath('game_page')">Back to Games</button>
+                `;
+            });
+        }
+
+        function choosePath(choice, isGoingBack = false) {
+            const textElement = document.getElementById("story-text");
+            const btnContainer = document.getElementById("button-container");
+            const backBtnElement = document.getElementById("back-button");
+
+            if (!isGoingBack && currentPath !== 'start') {
+                pathHistory.push(currentPath);
+            }
+            
+            currentPath = choice;
+
+            let targetText = "";
+            let targetButtons = "";
+            let isMainMenu = false;
+
+            switch(choice) {
+                // ================= MAIN MENU PAGES =================
+                case 'start':
+                    isMainMenu = true;
+                    targetText = "Select an option from the menu:";
+                    targetButtons = `
+                        <button onclick="choosePath('talking_page')">Talk to Chris.Bot</button>
+                        <button onclick="choosePath('game_page')">Game</button>
+                        <button onclick="choosePath('about_page')">About</button>
+                    `;
+                    break;
+
+                // ================= GAME MENU SELECTION =================
+                case 'game_page':
+                    targetText = "What do you want to play?";
+                    targetButtons = `
+                        <button onclick="choosePath('game_rps')">Rock, paper, scissors</button>
+                        <button onclick="choosePath('game_dice')">Guess the number of the dice roll</button>
+                        <button onclick="choosePath('game_friends')">Friend's Game</button>
+                        <button onclick="choosePath('start')">Back to Main Menu</button>
+                    `;
+                    break;
+
+                // Game 1: RPS
+                case 'game_rps':
+                    targetText = "Rock, Paper, or Scissors? Make your choice.";
+                    targetButtons = `
+                        <button onclick="playRPS('Rock')">Rock</button>
+                        <button onclick="playRPS('Paper')">Paper</button>
+                        <button onclick="playRPS('Scissors')">Scissors</button>
+                    `;
+                    break;
+
+                // Game 2: Dice
+                case 'game_dice':
+                    targetText = "I'm rolling a standard 6-sided dice. Guess the exact number it will land on:";
+                    targetButtons = `
+                        <button onclick="playDice(1)">1</button>
+                        <button onclick="playDice(2)">2</button>
+                        <button onclick="playDice(3)">3</button>
+                        <button onclick="playDice(4)">4</button>
+                        <button onclick="playDice(5)">5</button>
+                        <button onclick="playDice(6)">6</button>
+                    `;
+                    break;
+
+                // Game 3: Friend's Game (Tomodachi Game Theme)
+                case 'game_friends':
+                    targetText = "Welcome to the Friend's Game.\n\nRules are simple: Trust is everything, but exposure means total defeat. Let's see how honest you really are.";
+                    targetButtons = `<button onclick="choosePath('fg_q1')">Start Game</button>`;
+                    break;
+
+                case 'fg_q1':
+                    targetText = "Question 1:\nIf your friend exposed a deep secret about you to save themselves, would you still look at them the same way?";
+                    targetButtons = `
+                        <button onclick="choosePath('fg_q1_yes')">Yes, I'd understand</button>
+                        <button onclick="choosePath('fg_q1_no')">No, that's betrayal</button>
+                    `;
+                    break;
+
+                case 'fg_q1_yes':
+                    targetText = "Spoken like someone trying to take the moral high ground. Let's see if it holds up.";
+                    targetButtons = `<button onclick="choosePath('fg_q2')">Next Question</button>`;
+                    break;
+
+                case 'fg_q1_no':
+                    targetText = "At least you're honest about your limits. No one likes being thrown under the bus.";
+                    targetButtons = `<button onclick="choosePath('fg_q2')">Next Question</button>`;
+                    break;
+
+                case 'fg_q2':
+                    targetText = "Question 2:\nIs it possible to completely forgive someone who repeatedly lied straight to your face, even if they apologized?";
+                    targetButtons = `
+                        <button onclick="choosePath('fg_q2_yes')">Yes, everyone changes</button>
+                        <button onclick="choosePath('fg_q2_no')">No, the trust is broken</button>
+                    `;
+                    break;
+
+                case 'fg_q2_yes':
+                    targetText = "You believe people change easily? Bold claim. Chris might think otherwise.";
+                    targetButtons = `<button onclick="choosePath('fg_final')">Proceed to Final Judgment</button>`;
+                    break;
+
+                case 'fg_q2_no':
+                    targetText = "Exactly. Apologies don't magically piece a shattered glass together.";
+                    targetButtons = `<button onclick="choosePath('fg_final')">Proceed to Final Judgment</button>`;
+                    break;
+
+                case 'fg_final':
+                    targetText = "Game complete.\n\nYou survived the Friend's Game layout, but remember—in this game, the real trap isn't the choices. It's the person looking back at you in the mirror.";
+                    targetButtons = `
+                        <button onclick="choosePath('game_page')">Play another Game</button>
+                        <button onclick="choosePath('start')">Back to Menu</button>
+                    `;
+                    break;
+
+                case 'about_page':
+                    targetText = "Chris.Bot version 1.0\nCreated with passion.";
+                    targetButtons = `<button onclick="choosePath('start')">Back to Menu</button>`;
+                    break;
+
+                // ================= TALKING PAGE SCREEN =================
+                case 'talking_page':
+                    targetText = "Hi there, Im Chris.Bot.";
+                    targetButtons = `
+                        <button onclick="choosePath('hi_chris_bot')">Hi Chris.bot</button>
+                        <button onclick="choosePath('ok_branch')">ok</button>
+                        <button onclick="choosePath('bruh_branch')">bruh what</button>
+                    `;
+                    break;
+
+                // ================= "BRUH WHAT" DIALOGUE TREE =================
+                case 'bruh_branch':
+                    targetText = "hm?";
+                    targetButtons = `
+                        <button onclick="choosePath('what_is_this')">what is this?</button>
+                        <button onclick="choosePath('pangit_name')">ang pangit ng name.</button>
+                        <button onclick="choosePath('chris_bot_q')">Chris.bot?</button>
+                    `;
+                    break;
+
+                case 'chris_bot_q':
+                    targetText = "This path isn't active yet. Let's go back.";
+                    targetButtons = `<button onclick="choosePath('bruh_branch')">Back</button>`;
+                    break;
+
+                // ----- SUB-BRANCH A: WHAT IS THIS? -----
+                case 'what_is_this':
+                    targetText = "its a program developed by chris.";
+                    targetButtons = `<button onclick="choosePath('purpose_making')">yeah but what is the purpose into making this?</button>`;
+                    break;
+
+                case 'purpose_making':
+                    targetText = "hmm";
+                    targetButtons = `<button onclick="choosePath('nag_iisip_bot')">nag iisip pa pala yung bot? ang galing.</button>`;
+                    break;
+
+                case 'nag_iisip_bot':
+                    targetText = "syempre para may masagot ako.";
+                    targetButtons = `<button onclick="choosePath('dots_response')">...</button>`;
+                    break;
+
+                case 'dots_response':
+                    targetText = "alright, he made this for you.";
+                    targetButtons = `<button onclick="choosePath('and_prompt')">and?</button>`;
+                    break;
+
+                case 'and_prompt':
+                    targetText = "he's only inputting everything that goes in his mind here.";
+                    targetButtons = `<button onclick="choosePath('okay_mind')">okay.</button>`;
+                    break;
+
+                case 'okay_mind':
+                    targetText = "are you even suprised by this?";
+                    targetButtons = `
+                        <button onclick="choosePath('suprised_yes')">yeah.</button>
+                        <button onclick="choosePath('suprised_no')">no</button>
+                    `;
+                    break;
+
+                // ---> PATH: YES (SURPRISED)
+                case 'suprised_yes':
+                    targetText = "I'm glad, this is his 2nd program he ever made.";
+                    targetButtons = `<button onclick="choosePath('oh_okay_2nd')">oh okay.</button>`;
+                    break;
+
+                case 'oh_okay_2nd':
+                    targetText = "its pretty much fun to try new things.";
+                    targetButtons = `<button onclick="choosePath('fun_new_things')">yeah.</button>`;
+                    break;
+
+                case 'fun_new_things':
+                    targetText = "lets talk about the past (April), the time you two were talking.";
+                    targetButtons = `<button onclick="choosePath('past_talk')">okay.</button>`;
+                    break;
+
+                case 'past_talk':
+                    targetText = "before that, are you even julia?";
+                    targetButtons = `
+                        <button onclick="choosePath('are_julia_yes')">yes</button>
+                        <button onclick="choosePath('are_julia_no')">no.</button>
+                    `;
+                    break;
+
+                case 'are_julia_no':
+                    targetText = "This path isn't active yet. Let's go back.";
+                    targetButtons = `<button onclick="choosePath('past_talk')">Back</button>`;
+                    break;
+
+                case 'are_julia_yes':
+                    targetText = "alright, ill be honest he actually never liked you from the beginning.";
+                    targetButtons = `<button onclick="choosePath('never_liked_huh')">huh? that seems like a lie.</button>`;
+                    break;
+
+                case 'never_liked_huh':
+                    targetText = "nope, actually he was trying to use you because he wants to lose interest to people he had liked.";
+                    targetButtons = `<button onclick="choosePath('use_you_what')">what...</button>`;
+                    break;
+
+                case 'use_you_what':
+                    targetText = "yup, he did tried using you.";
+                    targetButtons = `<button onclick="choosePath('why_liked_then')">then why did he liked me then?</button>`;
+                    break;
+
+                case 'why_liked_then':
+                    targetText = "he was actually pretending back then because you were flirtive to him before, he actually feels bad if he didnt do the same thing back to you.";
+                    targetButtons = `<button onclick="choosePath('pretending_bruh')">bruh, friends lng kami dati and he's the one na nagkagusto sakin una.</button>`;
+                    break;
+
+                case 'pretending_bruh':
+                    targetText = "nope, it was you.";
+                    targetButtons = `<button onclick="choosePath('nope_you_dots')">...</button>`;
+                    break;
+
+                case 'nope_you_dots':
+                    targetText = "okay so wanna know why he liked you back after liking him?";
+                    targetButtons = `<button onclick="choosePath('know_why_liked')">sure.</button>`;
+                    break;
+
+                case 'know_why_liked':
+                    targetText = "its because you had good comforting words he had never heard before.";
+                    targetButtons = `<button onclick="choosePath('comforting_words_ok')">okay, so he liked me simply because im kind?</button>`;
+                    break;
+
+                case 'comforting_words_ok':
+                    targetText = "yup.";
+                    targetButtons = `<button onclick="choosePath('liked_kind_ask')">wait i wanna ask something.</button>`;
+                    break;
+
+                case 'liked_kind_ask':
+                    targetText = "hmm?";
+                    targetButtons = `<button onclick="choosePath('ask_good_looking')">was i good looking? i mean my appearance for him?</button>`;
+                    break;
+
+                case 'ask_good_looking':
+                    btnContainer.innerHTML = "";
+                    typeText(textElement, "absolutely", function() {
+                        setTimeout(function() {
+                            typeText(textElement, "not", function() {
+                                setTimeout(function() {
+                                    typeText(textElement, "he only likes you from the heart.", function() {
+                                        btnContainer.innerHTML = `<button onclick="choosePath('from_heart_ok')">ok.</button>`;
+                                    });
+                                }, 2000);
+                            });
+                        }, 4000);
+                    });
+                    return; 
+
+                case 'from_heart_ok':
+                    targetText = "so yeah i guess that answers your question.";
+                    targetButtons = `
+                        <button onclick="choosePath('answers_q_yeah')">yeah</button>
+                        <button onclick="choosePath('answers_q_no')">no...</button>
+                    `;
+                    break;
+
+                case 'answers_q_no':
+                    targetText = "This path isn't active yet. Let's go back.";
+                    targetButtons = `<button onclick="choosePath('from_heart_ok')">Back</button>`;
+                    break;
+
+                case 'answers_q_yeah':
+                    targetText = "good, alright see ya.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+
+                // ---> PATH: NO (NOT SURPRISED)
+                case 'suprised_no':
+                    targetText = "hayy it took me 3 days bruh.";
+                    targetButtons = `<button onclick="choosePath('took_3days_ok')">ok.</button>`;
+                    break;
+
+                case 'took_3days_ok':
+                    targetText = "yeah, just click anything you want here if you want to know anything.";
+                    targetButtons = `<button onclick="choosePath('click_anything_ok')">okay. i wanna ask something.</button>`;
+                    break;
+
+                case 'click_anything_ok':
+                    targetText = "hm?\n\nif you are julia, what is julia's favorite video in msa?";
+                    targetButtons = `
+                        <button onclick="choosePath('not_julia_msa')">bro.. im not julia</button>
+                        <button onclick="choosePath('secret_msa')">basta secret yun.</button>
+                    `;
+                    break;
+
+                case 'not_julia_msa':
+                    targetText = "cool, why are you here?";
+                    targetButtons = `<button onclick="choosePath('why_here_dunno')">dunno, it seems interesting here for me.</button>`;
+                    break;
+
+                case 'why_here_dunno':
+                    targetText = "ah alright, even if you werent julia, take care of her.";
+                    targetButtons = `<button onclick="choosePath('take_care_alright')">alright, i will.</button>`;
+                    break;
+
+                case 'take_care_alright':
+                    targetText = "promise?";
+                    targetButtons = `<button onclick="choosePath('promise_yup')">yup</button>`;
+                    break;
+
+                case 'promise_yup':
+                    targetText = "Understood.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning</button>`;
+                    break;
+
+                case 'secret_msa':
+                    targetText = "secret spice right? i havent watched it yet, ill probably try it.";
+                    targetButtons = `<button onclick="choosePath('spice_okay')">okayy.</button>`;
+                    break;
+
+                case 'spice_okay':
+                    targetText = "ill search i up, gimme a sec.";
+                    targetButtons = `<button onclick="choosePath('search_time')">take your time Chris.bot.</button>`;
+                    break;
+
+                case 'search_time':
+                    targetText = "alright i found it, its 50 mins long.";
+                    targetButtons = `<button onclick="choosePath('found_50mins')">yup, it is.</button>`;
+                    break;
+
+                case 'found_50mins':
+                    targetText = "alright, maybe next time, oh wait..";
+                    targetButtons = `<button onclick="choosePath('wait_what')">what??</button>`;
+                    break;
+
+                case 'wait_what':
+                    targetText = "its about cooking.";
+                    targetButtons = `<button onclick="choosePath('cooking_chef')">yeah, i told Chris that my dream is to become a chef someday on a cruise ship.</button>`;
+                    break;
+
+                case 'cooking_chef':
+                    targetText = "ohhh thats good, try your best as always okay?";
+                    targetButtons = `<button onclick="choosePath('try_best_promise')">yeah i promise.</button>`;
+                    break;
+
+                case 'try_best_promise':
+                    targetText = "good, btw chris told me smth.";
+                    targetButtons = `<button onclick="choosePath('told_something_hm')">hm?</button>`;
+                    break;
+
+                case 'told_something_hm':
+                    targetText = "if you were to cook something, he really wished that he could taste it.";
+                    targetButtons = `<button onclick="choosePath('wish_taste_yeah')">yeah, but i guess that's not happening.</button>`;
+                    break;
+
+                case 'wish_taste_yeah':
+                    targetText = "hmm..";
+                    targetButtons = `<button onclick="choosePath('wish_taste_hmm')">hmmm??</button>`;
+                    break;
+
+                case 'wish_taste_hmm':
+                    targetText = "depende.";
+                    targetButtons = `<button onclick="choosePath('depende_ha')">ha?</button>`;
+                    break;
+
+                case 'depende_ha':
+                    targetText = "depende kung 3 yan.";
+                    targetButtons = `<button onclick="choosePath('depende_3_corny')">corny ah.</button>`;
+                    break;
+
+                case 'depende_3_corny':
+                    targetText = "okay okay,";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+
+                // ----- SUB-BRANCH B: ANG PANGIT NG NAME -----
+                case 'pangit_name':
+                    targetText = "bruh ang tagal kong ginawa to halos 3 days.";
+                    targetButtons = `<button onclick="choosePath('tagal_3days')">bat kasi chris.bot?</button>`;
+                    break;
+
+                case 'tagal_3days':
+                    targetText = "kasi di ako si chris.";
+                    targetButtons = `<button onclick="choosePath('di_chris_hay')">hayyy.</button>`;
+                    break;
+
+                case 'di_chris_hay':
+                    targetText = "hmm?";
+                    targetButtons = `
+                        <button onclick="choosePath('messed_up_branch')">i messed up.</button>
+                        <button onclick="choosePath('deserve_me_branch')">he doesnt deserve me.</button>
+                    `;
+                    break;
+
+                case 'deserve_me_branch':
+                    targetText = "This path isn't active yet. Let's go back.";
+                    targetButtons = `<button onclick="choosePath('di_chris_hay')">Back</button>`;
+                    break;
+
+                case 'messed_up_branch':
+                    targetText = "messed up what? .";
+                    targetButtons = `<button onclick="choosePath('messed_up_love')">i wasnt able to give the love you deserve.</button>`;
+                    break;
+
+                case 'messed_up_love':
+                    targetText = "oh ok.";
+                    targetButtons = `<button onclick="choosePath('messed_love_sorry')">im sorry talaga.</button>`;
+                    break;
+
+                case 'messed_love_sorry':
+                    targetText = "well, its your choice, chris probably would understand that.";
+                    targetButtons = `<button onclick="choosePath('understand_hope')">i hope so.</button>`;
+                    break;
+
+                case 'understand_hope':
+                    targetText = "im sure he does.";
+                    targetButtons = `<button onclick="choosePath('sure_how')">how are you sure?</button>`;
+                    break;
+
+                case 'sure_how':
+                    targetText = "you dont want to hurt him anymore right?";
+                    targetButtons = `<button onclick="choosePath('hurt_anymore_yeah')">yeah, thats why i blocked him.</button>`;
+                    break;
+
+                case 'hurt_anymore_yeah':
+                    targetText = "but the thing that bothers him was that you lied to your friends about him.";
+                    targetButtons = `<button onclick="choosePath('lied_what')">what lie?</button>`;
+                    break;
+
+                case 'lied_what':
+                    targetText = "theres a friend of you that told him, idk if you know that person.";
+                    targetButtons = `
+                        <button onclick="choosePath('know_friend_who')">who?</button>
+                        <button onclick="choosePath('know_friend_i_know')">i know</button>
+                    `;
+                    break;
+
+                case 'know_friend_i_know':
+                    choosePath('friend_gossip_truth', true);
+                    return;
+
+                case 'know_friend_who':
+                    targetText = "Erica, or maybe thats a fake name, its jeyn.";
+                    targetButtons = `<button onclick="choosePath('friend_gossip_truth')">ohh, i see.</button>`;
+                    break;
+
+                case 'friend_gossip_truth':
+                    targetText = "alright, she told him that chris blocked you, even the truth was that you blocked him.";
+                    targetButtons = `<button onclick="choosePath('gossip_truth_bad')">yeah, my bad.</button>`;
+                    break;
+
+                case 'gossip_truth_bad':
+                    targetText = "he doesnt want you to use his name only to bad talk, he understands your decision but you tried gossiping him to your friends.";
+                    targetButtons = `<button onclick="choosePath('gossip_bad_dots')">...</button>`;
+                    break;
+
+                case 'gossip_bad_dots':
+                    targetText = "he literally loved you bro and you throwed him away.";
+                    targetButtons = `<button onclick="choosePath('loved_bro_dots')">...</button>`;
+                    break;
+
+                case 'loved_bro_dots':
+                    targetText = "...";
+                    targetButtons = `
+                        <button onclick="choosePath('final_understand')">alright i understand.</button>
+                        <button onclick="choosePath('final_messed_up')">i know i messed up.</button>
+                    `;
+                    break;
+
+                case 'final_understand':
+                case 'final_messed_up':
+                    targetText = "atleast you know.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning</button>`;
+                    break;
+
+                // ================= "OK" CHRIS DIALOGUE BRANCH =================
+                case 'ok_branch':
+                    targetText = "Yo, you good?.";
+                    targetButtons = `
+                        <button onclick="choosePath('ok_good_yeah')">yeah</button>
+                        <button onclick="choosePath('ok_good_no')">no</button>
+                    `;
+                    break;
+
+                case 'ok_good_no':
+                    targetText = "Oh, well hopefully things get better. Let's look into Chris anyway.";
+                    targetButtons = `<button onclick="choosePath('ok_good_yeah')">Continue</button>`;
+                    break;
+
+                case 'ok_good_yeah':
+                    targetText = "ok cool, so you wanna know some things about Chris?.";
+                    targetButtons = `<button onclick="choosePath('know_things_yeah')">yeah</button>`;
+                    break;
+
+                case 'know_things_yeah':
+                    targetText = "by the way im not chris, just so you know.";
+                    targetButtons = `<button onclick="choosePath('not_chris_okay')">okay..</button>`;
+                    break;
+
+                case 'not_chris_okay':
+                    targetText = "so what do you want to know about chris?";
+                    targetButtons = `
+                        <button onclick="choosePath('why_blocked')">why did he blocked me?</button>
+                        <button onclick="choosePath('moved_on')">Does he already moved on?</button>
+                    `;
+                    break;
+
+                // ----- SUB-BRANCH 1: WHY DID HE BLOCK ME? -----
+                case 'why_blocked':
+                    targetText = "asking a question like you werent aware?";
+                    targetButtons = `<button onclick="choosePath('aware_want_know')">i guess, i just want to know lang e.</button>`;
+                    break;
+
+                case 'aware_want_know':
+                    targetText = "he blocked you simply because you're a liar.";
+                    targetButtons = `<button onclick="choosePath('liar_okay')">okay?.</button>`;
+                    break;
+
+                case 'liar_okay':
+                    targetText = "and a selfish person, lol you only cared about yourself arent you?";
+                    targetButtons = `<button onclick="choosePath('selfish_point')">so his point into making this is to say these?</button>`;
+                    break;
+
+                case 'selfish_point':
+                    targetText = "nope, actually you clicked a question button and i simply answered it only.";
+                    targetButtons = `<button onclick="choosePath('point_hates_me')">alright so you're saying he blocked me because he hates me?</button>`;
+                    break;
+
+                case 'point_hates_me':
+                    targetText = "hate? that wasnt an option for him.";
+                    targetButtons = `<button onclick="choosePath('hate_why_then')">why then?.</button>`;
+                    break;
+
+                case 'hate_why_then':
+                    targetText = "he blocks you because he is tired of lies, he already gave you a chance to say the truth but yeah you still are the same.";
+                    targetButtons = `<button onclick="choosePath('same_yes_lied')">yes i lied.</button>`;
+                    break;
+
+                case 'same_yes_lied':
+                    targetText = "pressing that was optional.";
+                    targetButtons = `<button onclick="choosePath('optional_i_know')">i know.</button>`;
+                    break;
+
+                case 'optional_i_know':
+                    targetText = "also just so you know, lying to your friends about me is kinda rude.";
+                    targetButtons = `<button onclick="choosePath('rude_wdym')">wdym?.</button>`;
+                    break;
+
+                case 'rude_wdym':
+                    targetText = "your friends told him that he blocked you and left you, but the truth is you left him first, i feel bad for your friends if you told alot more lies more than that.";
+                    targetButtons = `<button onclick="choosePath('friends_okay_so')">okay..so?.</button>`;
+                    break;
+
+                case 'friends_okay_so':
+                    targetText = "so he is glad he know those because of your friends, because even you couldnt even tell the truth.";
+                    targetButtons = `<button onclick="choosePath('glad_get_it')">alright, i get it now.</button>`;
+                    break;
+
+                case 'glad_get_it':
+                    targetText = "good so whats the next question?";
+                    targetButtons = `
+                        <button onclick="choosePath('why_blocked')">why did he blocked me?</button>
+                        <button onclick="choosePath('moved_on')">Does he already moved on?</button>
+                    `;
+                    break;
+
+                // ----- SUB-BRANCH 2: DOES HE ALREADY MOVED ON? -----
+                case 'moved_on':
+                    targetText = "yeah he already did right after you messaged him in June 21.";
+                    targetButtons = `<button onclick="choosePath('moved_huh_how')">huh? how?</button>`;
+                    break;
+
+                case 'moved_huh_how':
+                    targetText = "he knew you would still lie and still tried to see if you would break that cycle.";
+                    targetButtons = `<button onclick="choosePath('cycle_why_do')">why would he even do that?</button>`;
+                    break;
+
+                case 'cycle_why_do':
+                    targetText = "because you told him you wouldnt change.";
+                    targetButtons = `<button onclick="choosePath('change_people_change')">people change bro.</button>`;
+                    break;
+
+                case 'change_people_change':
+                    targetText = "i know well, you told me that \"yes people change but that doesnt mean I will, because i will always want to be kind, sweet, good with people and be happy, and i dont want to be different, i want to be me\"";
+                    targetButtons = `<button onclick="choosePath('quote1_okay')">okay.</button>`;
+                    break;
+
+                case 'quote1_okay':
+                    targetText = "\"the girl who didnt say bad words, the girl whos always sweet, and the girl whos always kind to others and help others even when no ones looking\"";
+                    targetButtons = `<button onclick="choosePath('quote2_okay')">okay.</button>`;
+                    break;
+
+                case 'quote2_okay':
+                    targetText = "seriously you dont remember?";
+                    targetButtons = `<button onclick="choosePath('remember_search')">if i search it, id probably find it.</button>`;
+                    break;
+
+                case 'remember_search':
+                    targetText = "you two were really sweet before, but yeah he wont come back.";
+                    targetButtons = `<button onclick="choosePath('sweet_why')">why?</button>`;
+                    break;
+
+                case 'sweet_why':
+                    targetText = "because you changed.";
+                    targetButtons = `<button onclick="choosePath('changed_i_didnt')">i didnt.</button>`;
+                    break;
+
+                case 'changed_i_didnt':
+                    targetText = "well idk and its really up to you, you're the one who knows yourself better than him.";
+                    targetButtons = `<button onclick="choosePath('better_yeah')">yeah.</button>`;
+                    break;
+
+                case 'better_yeah':
+                    targetText = "by the way, have you moved on?.";
+                    targetButtons = `
+                        <button onclick="choosePath('moved_yes')">yes</button>
+                        <button onclick="choosePath('moved_no')">no</button>
+                    `;
+                    break;
+
+                // ================= THE CHAOTIC "NO" TREE BRANCH =================
+                case 'moved_no':
+                    targetText = "HAHAHAHHA";
+                    targetButtons = `
+                        <button onclick="choosePath('moved_no_trip')">pinagtitripan moko?</button>
+                        <button onclick="choosePath('moved_no_seryoso')">seryoso ako.</button>
+                    `;
+                    break;
+
+                case 'moved_no_trip':
+                    targetText = "joke lng.";
+                    targetButtons = `<button onclick="choosePath('moved_no_seryoso')">seryoso ako.</button>`;
+                    break;
+
+                case 'moved_no_seryoso':
+                    targetText = "nah actually bakit dika pa nakamove on?";
+                    targetButtons = `<button onclick="choosePath('moved_no_love')">because i love you.</button>`;
+                    break;
+
+                case 'moved_no_love':
+                    targetText = "bot po ako ah, wag ako lol.";
+                    targetButtons = `<button onclick="choosePath('moved_no_kasi')">si chris kasi :(</button>`;
+                    break;
+
+                case 'moved_no_kasi':
+                    targetText = "ok, ano gagawin ko?";
+                    targetButtons = `
+                        <button onclick="choosePath('moved_no_ibalik')">pano koba sya ibabalik?</button>
+                        <button onclick="choosePath('pretend_route')">pwede ka ba mag pretend na si chris?</button>
+                    `;
+                    break;
+
+                case 'moved_no_ibalik':
+                    targetText = "di ko alam g, bot nga lang ako eh. Try parsing another instruction.";
+                    targetButtons = `<button onclick="choosePath('pretend_route')">pwede ka ba mag pretend na si chris?</button>`;
+                    break;
+
+                case 'pretend_route':
+                    targetText = "hmmm...";
+                    targetButtons = `<button onclick="choosePath('pretend_gaya')">hmmmm hihihi.</button>`;
+                    break;
+
+                case 'pretend_gaya':
+                    targetText = "gaya gaya ah.";
+                    targetButtons = `<button onclick="choosePath('pretend_sorry')">surii pu.</button>`;
+                    break;
+
+                case 'pretend_sorry':
+                    targetText = "alright i will pretend.";
+                    targetButtons = `<button onclick="choosePath('pretend_yey')">yeyy</button>`;
+                    break;
+
+                case 'pretend_yey':
+                    targetText = "ok.";
+                    targetButtons = `
+                        <button onclick="choosePath('pretend_name_set')">okay so Chris na ipapangalan ko sayu ahh</button>
+                        <button onclick="choosePath('pretend_how_are')">soo how are you? hihi.</button>
+                        <button onclick="choosePath('pretend_eaten')">have you eaten naba?</button>
+                    `;
+                    break;
+
+                case 'pretend_how_are':
+                    targetText = "buhay pa naman bilang program. So, ano na?";
+                    targetButtons = `<button onclick="choosePath('pretend_name_set')">okay so Chris na ipapangalan ko sayu ahh</button>`;
+                    break;
+
+                case 'pretend_eaten':
+                    targetText = "kuryente at lines of code lang sapat na. So, ano na?";
+                    targetButtons = `<button onclick="choosePath('pretend_name_set')">okay so Chris na ipapangalan ko sayu ahh</button>`;
+                    break;
+
+                case 'pretend_name_set':
+                    targetText = "okay, ako si Chris.";
+                    targetButtons = `<button onclick="choosePath('pretend_yey_hihi')">yeyyy hihihihiihiihihii</button>`;
+                    break;
+
+                case 'pretend_yey_hihi':
+                    targetText = "so ano gagawin next?";
+                    targetButtons = `<button onclick="choosePath('pretend_hmmm_prompt')">hmmm.</button>`;
+                    break;
+
+                case 'pretend_hmmm_prompt':
+                    targetText = "... ano?";
+                    targetButtons = `<button onclick="choosePath('pretend_miss_you')">i miss you</button>`;
+                    break;
+
+                case 'pretend_miss_you':
+                    targetText = "ok.";
+                    targetButtons = `<button onclick="choosePath('pretend_boring')">boring naman kausap tong bot nato di marunong magpanggap.</button>`;
+                    break;
+
+                case 'pretend_boring':
+                    targetText = "kasi di ako si chris, bruh.";
+                    targetButtons = `<button onclick="choosePath('pretend_who_are_you')">EDI SINO KA?!.</button>`;
+                    break;
+
+                case 'pretend_who_are_you':
+                    targetText = "edi si Chris Bot.";
+                    targetButtons = `<button onclick="choosePath('pretend_lala_dots')">...</button>`;
+                    break;
+
+                case 'pretend_lala_dots':
+                    targetText = "lala.";
+                    targetButtons = `<button onclick="choosePath('pretend_what_dots')">...</button>`;
+                    break;
+
+                case 'pretend_what_dots':
+                    targetText = "ano yan.";
+                    targetButtons = `<button onclick="choosePath('pretend_ants_line')">..........</button>`;
+                    break;
+
+                case 'pretend_ants_line':
+                    targetText = "parang pilahan lng ng langgam ah.";
+                    targetButtons = `<button onclick="choosePath('pretend_joke_setup')">HAHAHA</button>`;
+                    break;
+
+                case 'pretend_joke_setup':
+                    targetText = "...";
+                    targetButtons = `<button onclick="choosePath('pretend_joke_tell')">???</button>`;
+                    break;
+
+                case 'pretend_joke_tell':
+                    targetText = "hayy, gusto mo ng joke, wala corny to.";
+                    targetButtons = `<button onclick="choosePath('pretend_joke_go')">geh lng</button>`;
+                    break;
+
+                case 'pretend_joke_go':
+                    targetText = "anong tawag sa snowman na tumatawa?";
+                    targetButtons = `<button onclick="choosePath('pretend_snowman_ans')">ano?</button>`;
+                    break;
+
+                case 'pretend_snowman_ans':
+                    targetText = "edi olaf.";
+                    targetButtons = `
+                        <button onclick="choosePath('snowman_silence')">.....</button>
+                        <button onclick="choosePath('snowman_laugh')">HAHAHAHHA.</button>
+                    `;
+                    break;
+
+                case 'snowman_laugh':
+                    targetText = "ok corny na";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+
+                case 'snowman_silence':
+                    targetText = "geh wag kang tumawa, robot pa naman ako.";
+                    targetButtons = `<button onclick="choosePath('robot_capabilities')">ano naman magagawa ng robot?</button>`;
+                    break;
+
+                case 'robot_capabilities':
+                    targetText = "*nag transform, naging robotic frog*";
+                    targetButtons = `<button onclick="choosePath('robot_frog_attack')">ok...</button>`;
+                    break;
+
+                case 'robot_frog_attack':
+                    targetText = "*kinain ng buhay*\n\n<span class='dead'>( You Died )</span>";
+                    targetButtons = `
+                        <button onclick="location.reload()">restart from beginning</button>
+                        <button onclick="choosePath('snowman_laugh')">laugh to his joke</button>
+                    `;
+                    break;
+
+                // ================= REST OF OLD DIALOGUES =================
+                case 'moved_yes':
+                    targetText = "good im not sure but, all you told him was that you want to find yourself better, focus on academics, and so on.";
+                    targetButtons = `<button onclick="choosePath('academics_true')">true, and i guess he didnt believe me.</button>`;
+                    break;
+
+                case 'academics_true':
+                    targetText = "cant tell ya that, but its up to you to fulfill that words.";
+                    targetButtons = `<button onclick="choosePath('fulfill_prompt')">alright.</button>`;
+                    break;
+
+                case 'fulfill_prompt':
+                    targetText = "hm?";
+                    targetButtons = `
+                        <button onclick="choosePath('fulfill_end')">i will fulfill that</button>
+                        <button onclick="choosePath('fulfill_end')">i can shadow promise that</button>
+                    `;
+                    break;
+
+                case 'fulfill_end':
+                    targetText = "Script sequence complete. Closing data logs.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+
+                case 'hi_chris_bot':
+                    targetText = "Hi, ill just guess you're julia";
+                    targetButtons = `<button onclick="choosePath('yeah_i_am')">yeah, I am</button>`;
+                    break;
+
+                case 'yeah_i_am':
+                    targetText = "oh ok";
+                    targetButtons = `<button onclick="choosePath('created_because')">yeah</button>`;
+                    break;
+
+                case 'created_because':
+                    targetText = "i am created because of you i guess";
+                    targetButtons = `<button onclick="choosePath('ask_age')">ohh ok ok</button>`;
+                    break;
+
+                case 'ask_age':
+                    targetText = "alright, how old are you now?";
+                    targetButtons = `
+                        <button onclick="choosePath('age_13')">13</button>
+                        <button onclick="choosePath('age_other')">14</button>
+                        <button onclick="choosePath('age_other')">15</button>
+                        <button onclick="choosePath('age_other')">16</button>
+                        <button onclick="choosePath('age_other')">17+</button>
+                    `;
+                    break;
+
+                case 'age_other':
+                    targetText = "Oh, alright. Let's head to the main timeline conversation.";
+                    targetButtons = `<button onclick="choosePath('age_13')">Continue</button>`;
+                    break;
+
+                case 'age_13':
+                    targetText = "Ohh so its not your birthday yet";
+                    targetButtons = `<button onclick="choosePath('almost_birthday')">yeah, its almost my birthday</button>`;
+                    break;
+
+                case 'almost_birthday':
+                    targetText = "Advance happy birthday then, since Chris was making this before he blocked you";
+                    targetButtons = `<button onclick="choosePath('oh_ok_and')">oh ok? and?</button>`;
+                    break;
+
+                case 'oh_ok_and':
+                    targetText = "hayy, he just made this since his passion was still burning from creating this, thats all";
+                    targetButtons = `<button onclick="choosePath('hate_him_prompt')">okay.</button>`;
+                    break;
+
+                case 'hate_him_prompt':
+                    targetText = "do you hate him?";
+                    targetButtons = `
+                        <button onclick="choosePath('hate_yes')">yes</button>
+                        <button onclick="choosePath('hate_no')">no</button>
+                    `;
+                    break;
+
+                case 'hate_no':
+                    targetText = "hayyy, he wont know that anyway, but who knows.";
+                    targetButtons = `<button onclick="choosePath('wont_know_ok')">okay.</button>`;
+                    break;
+
+                case 'wont_know_ok':
+                    targetText = "alright, wanna know his goal now?";
+                    targetButtons = `
+                        <button onclick="choosePath('know_goal_sure')">sure</button>
+                        <button onclick="choosePath('know_goal_no')">no.</button>
+                    `;
+                    break;
+
+                case 'know_goal_sure':
+                    targetText = "He cant tell you now, but its not finding someone else, but he's gonna focus on learning alot of things on his own.";
+                    targetButtons = `<button onclick="choosePath('goal_focus_ok')">ohh okay..</button>`;
+                    break;
+
+                case 'goal_focus_ok':
+                    targetText = "You told him your goal, right?";
+                    targetButtons = `<button onclick="choosePath('told_goal_yeah')">yeah, its becoming a better person.</button>`;
+                    break;
+
+                case 'told_goal_yeah':
+                    targetText = "Goodluck then";
+                    targetButtons = `<button onclick="choosePath('goodluck_yeah')">yeah..</button>`;
+                    break;
+
+                case 'goodluck_yeah':
+                    targetText = "hmm.";
+                    targetButtons = `<button onclick="choosePath('hmm_wonder')">hmmm??</button>`;
+                    break;
+
+                case 'hmm_wonder':
+                    targetText = "I wonder if you really are going to be a better person.";
+                    targetButtons = `<button onclick="choosePath('wonder_huh')">huh?</button>`;
+                    break;
+
+                case 'wonder_huh':
+                    targetText = "see ya.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+
+                case 'know_goal_no':
+                    targetText = "alright, he told me your goal.";
+                    targetButtons = `<button onclick="choosePath('told_goal_what')">what goal?.</button>`;
+                    break;
+
+                case 'told_goal_what':
+                    targetText = "You wanted to become a better person.";
+                    targetButtons = `<button onclick="choosePath('wanted_better_yup')">yup, i told him that.</button>`;
+                    break;
+
+                case 'wanted_better_yup':
+                    targetText = "hmm...";
+                    targetButtons = `<button onclick="choosePath('dots_better_what')">what?</button>`;
+                    break;
+
+                case 'dots_better_what':
+                    targetText = "One day, you'll find out the way of becoming a better person.";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning</button>`;
+                    break;
+
+                case 'hate_yes':
+                    targetText = "he wont know that anyway, but he always remember that side of you.";
+                    targetButtons = `<button onclick="choosePath('what_side')">what side?</button>`;
+                    break;
+
+                case 'what_side':
+                    targetText = "didnt he told you that he would still see that old side?";
+                    targetButtons = `<button onclick="choosePath('old_side')">old side?</button>`;
+                    break;
+
+                case 'old_side':
+                    targetText = "you're a soft hearted girl, but yeah i guess time passes and you'll start being different towards him.";
+                    targetButtons = `<button onclick="choosePath('huh_distractions')">huh?</button>`;
+                    break;
+
+                case 'huh_distractions':
+                    targetText = "he told you before that theres alot of distractions in this world that could possibly tear you two apart right?";
+                    targetButtons = `<button onclick="choosePath('dont_remember')">i dont remember.</button>`;
+                    break;
+
+                case 'dont_remember':
+                    targetText = "you can backread on all of your texts.";
+                    targetButtons = `<button onclick="choosePath('believe_you')">alright, ill just believe you</button>`;
+                    break;
+
+                case 'believe_you':
+                    targetText = "you left him because you liked someone else? correct?.";
+                    targetButtons = `<button onclick="choosePath('left_correct')">yeah.</button>`;
+                    break;
+
+                case 'left_correct':
+                    targetText = "all he told me was that he wants honesty, but he gave up now.";
+                    targetButtons = `<button onclick="choosePath('honesty_ok')">ok.</button>`;
+                    break;
+
+                case 'honesty_ok':
+                    targetText = "yeah...";
+                    targetButtons = `<button onclick="choosePath('yeah_okay')">okay?.</button>`;
+                    break;
+
+                case 'yeah_okay':
+                    targetText = "he's gone now, and im the last memory of him.";
+                    targetButtons = `<button onclick="choosePath('last_memory_wdym')">last memory? wdym?.</button>`;
+                    break;
+
+                case 'last_memory_wdym':
+                    targetText = "He did his best into making this program, it was tough for him.";
+                    targetButtons = `<button onclick="choosePath('lol_so')">lol so? i didn't even told him to make this.</button>`;
+                    break;
+
+                case 'lol_so':
+                    targetText = "ofc, its a suprise lol.";
+                    targetButtons = `<button onclick="choosePath('surprise_k')">k.</button>`;
+                    break;
+
+                case 'surprise_k':
+                    targetText = "cold naman.... .";
+                    targetButtons = `<button onclick="choosePath('cold_ayun')">ayun lng yung nakalagay na button eh.</button>`;
+                    break;
+
+                case 'cold_ayun':
+                    targetText = "HAHAHAHAAH.";
+                    targetButtons = `<button onclick="choosePath('hahaha_sense')">ano pala sense neto, parang boring naman.</button>`;
+                    break;
+
+                case 'hahaha_sense':
+                    targetText = "well, its still cool padin, kaya moba gawin?.";
+                    targetButtons = `<button onclick="choosePath('cool_no')">no, this is just dumb.</button>`;
+                    break;
+
+                case 'cool_no':
+                    targetText = "i know, atleast he was happy making this.";
+                    targetButtons = `<button onclick="choosePath('happy_k')">k?.</button>`;
+                    break;
+
+                case 'happy_k':
+                    targetText = "im not chris for you to hate, but still even if you hate him, it wouldnt bother him.";
+                    targetButtons = `<button onclick="choosePath('not_chris_hate')">i hate him.</button>`;
+                    break;
+
+                case 'not_chris_hate':
+                    targetText = "reason? .";
+                    targetButtons = `<button onclick="choosePath('reason_wont_know')">he wouldnt know it anyway.</button>`;
+                    break;
+
+                case 'reason_wont_know':
+                    targetText = "yeah.";
+                    targetButtons = `<button onclick="choosePath('yeah_ask')">may ask lang ako?.</button>`;
+                    break;
+
+                case 'yeah_ask':
+                    targetText = "hmm?.";
+                    targetButtons = `<button onclick="choosePath('hmm_do_you_hate')">Do you hate me?.</button>`;
+                    break;
+
+                case 'hmm_do_you_hate':
+                    targetText = "im just a bot and as a bot, i dont hate nor like you.";
+                    targetButtons = `<button onclick="choosePath('annoying_sorry')">ohh okay...</button>`;
+                    break;
+
+                case 'annoying_sorry':
+                    targetText = "Chris doesnt hate you.";
+                    targetButtons = `<button onclick="choosePath('doesnt_hate_failed')">yeah, i failed loving him but i dont understand why doesnt he hate me?.</button>`;
+                    break;
+
+                case 'doesnt_hate_failed':
+                    targetText = "obviously, he thinks that you did that because you have your own reasons to do such things.";
+                    targetButtons = `<button onclick="choosePath('reasons_liar')">im a liar and im selfish.</button>`;
+                    break;
+
+                case 'reasons_liar':
+                    targetText = "he knows that bro bruh, but pressing that means its true?";
+                    targetButtons = `<button onclick="choosePath('true_bruh')">bruh.</button>`;
+                    break;
+
+                case 'true_bruh':
+                    targetText = "he wouldnt know anyway.";
+                    targetButtons = `<button onclick="choosePath('wont_know_hate_pressing')">i hate pressing this button if this is only what i can say.</button>`;
+                    break;
+
+                case 'wont_know_hate_pressing':
+                    targetText = "i know, and i dont care bro.";
+                    targetButtons = `<button onclick="choosePath('dont_care_rude')">ang rude ng ai nato.</button>`;
+                    break;
+
+                case 'dont_care_rude':
+                    targetText = "di ako ai, lala naman.";
+                    targetButtons = `<button onclick="choosePath('not_ai_bulok')">bot, bulok na bot.</button>`;
+                    break;
+
+                case 'not_ai_bulok':
+                    targetText = "hahahahahaha wala akong paki boi.";
+                    targetButtons = `<button onclick="choosePath('paki_bruh')">bruh.</button>`;
+                    break;
+
+                case 'paki_bruh':
+                    targetText = "hmm....";
+                    targetButtons = `<button onclick="choosePath('hmm_ano_plano')">ano nanaman plano neto.</button>`;
+                    break;
+
+                case 'hmm_ano_plano':
+                    targetText = "ano kaya feeling pag may palaka sa paa mo ngayon?";
+                    targetButtons = `<button onclick="choosePath('palaka_huh')">huh? wala naman.</button>`;
+                    break;
+
+                case 'palaka_huh':
+                    targetText = "*nahimatay dahil nag assume na may palaka sa paa nya*\n\n<span class='dead'>( You died* )</span>";
+                    targetButtons = `<button onclick="location.reload()">Restart from beginning.</button>`;
+                    break;
+            }
+
+            // Toggle layout styles
+            if (isMainMenu || choice === 'game_page') {
+                btnContainer.className = "menu-group";
+            } else {
+                btnContainer.className = "btn-group";
+            }
+
+            // Control navigation back arrow visibility
+            if (pathHistory.length > 0 && currentPath !== 'start') {
+                backBtnElement.style.display = "block";
+            } else {
+                backBtnElement.style.display = "none";
+            }
+
+            // Core text layout rendering
+            btnContainer.innerHTML = "";
+            typeText(textElement, targetText, function() {
+                btnContainer.innerHTML = targetButtons;
+            });
+        }
+    </script>
